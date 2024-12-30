@@ -4,9 +4,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ServerController;
-use App\Http\Controllers\SubServerController;
-use App\Livewire\SubServerAdd;
-use App\Livewire\SubServerEdit;
+use App\Http\Controllers\SliderController;
+use App\Livewire\SliderAdd;
+use App\Livewire\SliderEdit;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'verifyRole:admin']], function () {
@@ -25,13 +25,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'verifyR
     Route::get('/plans/{plan:slug}', [PlanController::class, 'EditPlan'])->name('edit-plan');
     Route::delete('/plans/{plan:slug}', [PlanController::class, 'deletePlan'])->name('delete-plan');
 
+    Route::get('/sliders', [SliderController::class, 'index'])->name('all-sliders');
+    Route::get('/slider/add', SliderAdd::class)->name('add-slider');
+    Route::get('/slider/{slider}/edit', SliderEdit::class)->name('edit-slider');
+    Route::delete('/slider/{slider}/delete', [SliderController::class, 'destroy'])->name('delete-slider');
+
     Route::get('/customers', [AdminController::class, 'AllUsers'])->name('all-users');
     Route::delete('/delete-user/{user}', [AdminController::class, 'deleteUser'])->name('delete-user');
 
     Route::get('/options', [OptionsController::class, 'Options'])->name('all-options');
     Route::post('/options/save', [OptionsController::class, 'saveOptions'])->name('save-options');
-
-    Route::post('/options/titles/update', [OptionsController::class, 'titles'])->name('save-titles');
 
     Route::get('/adminUsers', [AdminController::class, 'allAdmins'])->name('all-admins');
 

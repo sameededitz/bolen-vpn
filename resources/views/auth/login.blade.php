@@ -53,8 +53,6 @@
                                     value="{{ old('remember') }}" name="remember" id="remeber">
                                 <label class="form-check-label" for="remeber">Remember me </label>
                             </div>
-                            <a href="{{ route('password.request') }}" class="text-primary-600 fw-medium">Forgot
-                                Password?</a>
                         </div>
                     </div>
 

@@ -5,14 +5,13 @@ use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\ServerController;
 use App\Http\Controllers\Api\VerifyController;
 use App\Http\Controllers\OptionsController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\SliderController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 
-    Route::post('/signup', [AuthController::class, 'signup'])->name('api.login');
+    Route::post('/signup', [AuthController::class, 'signup'])->name('api.signup');
 
     Route::post('/reset-password', [VerifyController::class, 'sendResetLink'])->name('api.reset.password');
 });
@@ -29,6 +28,6 @@ Route::post('/email/resend-verification', [VerifyController::class, 'resendVerif
 
 Route::get('/servers', [ServerController::class, 'index'])->name('api.all.servers');
 
-Route::get('/options', [OptionsController::class, 'getOptions'])->name('api.options');
+Route::get('/sliders', [SliderController::class, 'sliders'])->name('api.all.sliders');
 
-Route::get('/titles', [OptionsController::class, 'getTitles'])->name('api.titles');
+Route::get('/options', [OptionsController::class, 'getOptions'])->name('api.options');

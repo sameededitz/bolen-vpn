@@ -8,8 +8,10 @@
         "php": "^8.2",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
+        "socialiteproviders/apple": "^5.6",
         "spatie/laravel-medialibrary": "^11.8",
         "spatie/laravel-sluggable": "^3.6"
     },

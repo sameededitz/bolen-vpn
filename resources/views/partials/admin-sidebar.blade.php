@@ -32,6 +32,12 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('all-sliders') }}">
+                    <iconify-icon icon="solar:slider-vertical-broken" class="menu-icon"></iconify-icon>
+                    <span>Sliders</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('all-users') }}">
                     <iconify-icon icon="ri:user-line" class="menu-icon"></iconify-icon>
                     <span>Manage Users</span>

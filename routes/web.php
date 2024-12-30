@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PlanController;
 use App\Http\Controllers\VerifyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->timestamp('registration_date')->useCurrent();
             $table->timestamp('last_login')->nullable();
             $table->enum('role', ['customer', 'admin'])->default('customer');
+            $table->string('google_id')->nullable()->unique();
+            $table->string('apple_id')->nullable()->unique();
             $table->rememberToken();
             $table->timestamps();
         });
