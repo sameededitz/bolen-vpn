@@ -22,6 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/purchase', [PurchaseController::class, 'addPurchase'])->name('api.add.purchase');
 
     Route::post('/purchase/status', [PurchaseController::class, 'Status'])->name('api.purchase');
+
+    Route::post('/purchase/verify', [PurchaseController::class, 'verifyActivationCode'])->name('api.purchase.verify');
 });
 
 Route::post('/email/resend-verification', [VerifyController::class, 'resendVerify'])->name('api.verify.resend');

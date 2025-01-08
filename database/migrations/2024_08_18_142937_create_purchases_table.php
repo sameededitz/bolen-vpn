@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('started_at');
             $table->dateTime('expires_at');
             $table->boolean('is_active')->default(true);
+            $table->string('activation_code', 6)->unique();
             $table->timestamps();
         });
     }

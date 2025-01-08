@@ -17,6 +17,7 @@ class Purchase extends Model
         'started_at',
         'expires_at',
         'is_active',
+        'activation_code',
     ];
 
     public function user(): BelongsTo
