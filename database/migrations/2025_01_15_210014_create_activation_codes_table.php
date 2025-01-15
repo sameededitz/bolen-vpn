@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchases', function (Blueprint $table) {
+        Schema::create('activation_codes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('plan_id')->constrained()->onDelete('cascade');
-            $table->dateTime('started_at');
-            $table->dateTime('expires_at');
-            $table->boolean('is_active')->default(false);
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('code', 10)->unique();
+            $table->boolean('is_used')->default(false);
             $table->timestamps();
-        });
+        });        
     }
 
     /**
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchases');
+        Schema::dropIfExists('activation_codes');
     }
 };

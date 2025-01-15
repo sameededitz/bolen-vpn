@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\ServerController;
+use App\Http\Controllers\Api\SocialController;
 use App\Http\Controllers\Api\VerifyController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\SliderController;
@@ -14,6 +15,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/signup', [AuthController::class, 'signup'])->name('api.signup');
 
     Route::post('/reset-password', [VerifyController::class, 'sendResetLink'])->name('api.reset.password');
+
+    Route::post('/auth/google', [SocialController::class, 'handleGoogleCallback'])->name('api.auth.google');
+
+    Route::post('/auth/apple', [SocialController::class, 'handleAppleCallback'])->name('api.auth.apple');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -23,7 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/purchase/status', [PurchaseController::class, 'Status'])->name('api.purchase');
 
-    Route::post('/purchase/verify', [PurchaseController::class, 'verifyActivationCode'])->name('api.purchase.verify');
+    Route::post('/user/redeem-code', [PurchaseController::class, 'redeemActivationCode'])->name('api.purchase.verify');
 });
 
 Route::post('/email/resend-verification', [VerifyController::class, 'resendVerify'])->name('api.verify.resend');

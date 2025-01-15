@@ -32,6 +32,12 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('all-codes') }}">
+                    <iconify-icon icon="bi:qr-code" class="menu-icon"></iconify-icon>
+                    <span>Codes</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('all-sliders') }}">
                     <iconify-icon icon="solar:slider-vertical-broken" class="menu-icon"></iconify-icon>
                     <span>Sliders</span>

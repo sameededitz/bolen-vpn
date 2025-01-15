@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ActivationCodeMail;
+use App\Models\ActivationCode;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,6 @@ class PurchaseController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required|exists:plans,id',
-            'expires_at' => 'required|date|after:now',
         ]);
 
         if ($validator->fails()) {
@@ -27,27 +27,23 @@ class PurchaseController extends Controller
             ], 400);
         }
 
+        /** @var \App\Models\User $user **/
         $user = Auth::user();
 
         do {
-            $activationCode = Str::random(6);
-        } while (Purchase::where('activation_code', $activationCode)->exists());
+            $activationCode = Str::random(10);
+        } while (ActivationCode::where('code', $activationCode)->exists());
 
-        /** @var \App\Models\User $user **/
-        $purchase = $user->purchases()->create([
+        ActivationCode::create([
             'plan_id' => $request->plan_id,
-            'started_at' => now(),
-            'expires_at' => $request->expires_at,
-            'is_active' => false,
-            'activation_code' => $activationCode,
+            'code' => $activationCode,
         ]);
 
         Mail::to($user->email)->send(new ActivationCodeMail($activationCode, $user));
 
         return response()->json([
             'status' => true,
-            'message' => 'Purchase created successfully!',
-            'purchase' => $purchase
+            'message' => 'Purchase created successfully! Activation code sent to your email.',
         ], 201);
     }
 
@@ -55,20 +51,24 @@ class PurchaseController extends Controller
     {
         $user = Auth::user();
         /** @var \App\Models\User $user **/
-        $purchases = $user->purchases()->first()->map(function ($purchase) {
+        $purchases = $user->purchases()->get()->map(function ($purchase) {
             $purchase->is_expired = now()->greaterThan($purchase->expires_at);
             return $purchase;
         });
+        // $purchases = $user->purchases()
+        //     ->where('is_active', true)
+        //     ->where('expires_at', '>', now())
+        //     ->first();
         return response()->json([
             'status' => true,
             'purchases' => $purchases
         ], 200);
     }
 
-    public function verifyActivationCode(Request $request)
+    public function redeemActivationCode(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'activation_code' => 'required|string|size:6',
+            'code' => 'required|string|size:10',
         ]);
 
         if ($validator->fails()) {
@@ -78,30 +78,52 @@ class PurchaseController extends Controller
             ], 400);
         }
 
-        $user = Auth::user();
         /** @var \App\Models\User $user **/
+        $user = Auth::user();
 
-        $purchase = $user->purchases()
-            ->where('activation_code', $request->activation_code)
+        $activationCode = ActivationCode::where('code', $request->code)
+            ->where('is_used', false)
+            ->first();
+
+        if (!$activationCode) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid or already used activation code.',
+            ], 400);
+        }
+
+        if (!is_null($activationCode->user_id) && $activationCode->user_id !== $user->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'This activation code is not assigned to you.',
+            ], 403);
+        }
+
+        // Check if the user already has a purchase for this plan
+        $existingPurchase = $user->purchases()
+            ->where('plan_id', $activationCode->plan_id)
+            ->where('is_active', true)
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$purchase) {
+        if ($existingPurchase) {
             return response()->json([
                 'status' => false,
-                'message' => 'Invalid or expired activation code.',
+                'message' => 'You already have an active purchase for this plan.',
             ], 400);
         }
 
-        if ($purchase->is_active) {
-            return response()->json([
-                'status' => false,
-                'message' => 'This activation code has already been used.',
-            ], 400);
-        }
+        $purchase = $user->purchases()->create([
+            'plan_id' => $activationCode->plan_id,
+            'started_at' => now(),
+            'expires_at' => now()->addMonths($activationCode->plan->duration),
+            'is_active' => true,
+        ]);
 
-        // Activate the purchase
-        $purchase->update(['is_active' => true]);
+        $activationCode->update([
+            'is_used' => true,
+            'user_id' => $user->id,
+        ]);
 
         return response()->json([
             'status' => true,

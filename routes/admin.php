@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivationCodeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\PlanController;
@@ -24,6 +25,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'verifyR
     Route::get('/add-plan', [PlanController::class, 'AddPlan'])->name('add-plan');
     Route::get('/plans/{plan:slug}', [PlanController::class, 'EditPlan'])->name('edit-plan');
     Route::delete('/plans/{plan:slug}', [PlanController::class, 'deletePlan'])->name('delete-plan');
+
+    Route::get('/codes', [ActivationCodeController::class, 'codes'])->name('all-codes');
+    Route::post('/generate-code', [ActivationCodeController::class, 'generateActivationCode'])->name('generate-code');
+    Route::delete('/codes/delete/{code:code}', [ActivationCodeController::class, 'destroy'])->name('delete-code');
 
     Route::get('/sliders', [SliderController::class, 'index'])->name('all-sliders');
     Route::get('/slider/add', SliderAdd::class)->name('add-slider');
