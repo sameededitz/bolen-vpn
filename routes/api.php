@@ -17,9 +17,9 @@ Route::middleware('guest')->group(function () {
 
     Route::post('/reset-password', [VerifyController::class, 'sendResetLink'])->name('api.reset.password');
 
-    Route::post('/auth/google', [SocialController::class, 'handleGoogleCallback'])->name('api.auth.google');
+    Route::post('/login/google', [SocialController::class, 'handleGoogleCallback'])->name('api.auth.google');
 
-    Route::post('/auth/apple', [SocialController::class, 'handleAppleCallback'])->name('api.auth.apple');
+    Route::post('/login/apple', [SocialController::class, 'handleAppleCallback'])->name('api.auth.apple');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
