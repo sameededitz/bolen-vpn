@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ServerController;
 use App\Http\Controllers\Api\SocialController;
 use App\Http\Controllers\Api\VerifyController;
 use App\Http\Controllers\OptionsController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SliderController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/email/resend-verification', [VerifyController::class, 'resendVerify'])->name('api.verify.resend');
 
 Route::get('/servers', [ServerController::class, 'index'])->name('api.all.servers');
+
+Route::get('/plans', [PlanController::class, 'plans'])->name('api.all.plans');
 
 Route::get('/sliders', [SliderController::class, 'sliders'])->name('api.all.sliders');
 

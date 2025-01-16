@@ -18,7 +18,7 @@ class SliderAdd extends Component
     #[Validate]
     public $image;
 
-    protected function rules()
+    public function rules()
     {
         return [
             'title' => 'required|min:3',

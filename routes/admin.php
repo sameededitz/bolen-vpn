@@ -21,7 +21,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'verifyR
 
     Route::delete('/delete-server/{server}', [ServerController::class, 'DeleteServer'])->name('delete-server');
 
-    Route::get('/plans', [PlanController::class, 'Plans'])->name('all-plans');
+    Route::get('/plans', [PlanController::class, 'index'])->name('all-plans');
     Route::get('/add-plan', [PlanController::class, 'AddPlan'])->name('add-plan');
     Route::get('/plans/{plan:slug}', [PlanController::class, 'EditPlan'])->name('edit-plan');
     Route::delete('/plans/{plan:slug}', [PlanController::class, 'deletePlan'])->name('delete-plan');

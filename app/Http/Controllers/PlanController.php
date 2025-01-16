@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plan;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class PlanController extends Controller
 {
-    public function Plans()
+    public function index()
     {
         $plans = Plan::all();
         return view('admin.all-plans', compact('plans'));
@@ -31,6 +28,15 @@ class PlanController extends Controller
         return redirect()->route('all-plans')->with([
             'status' => 'success',
             'message' => 'Plan Deleted Successfully. Make sure to Delete Product from Stripe Dashboard',
+        ]);
+    }
+
+    public function plans()
+    {
+        $plans = Plan::all();
+        return response()->json([
+            'status' => true,
+            'plans' => $plans,
         ]);
     }
 }
