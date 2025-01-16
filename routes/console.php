@@ -8,4 +8,4 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-Schedule::command('purchases:remove-expired')->everyMinute()->onOneServer();
+Schedule::command('purchases:remove-expired')->daily()->onOneServer();
