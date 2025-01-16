@@ -10,7 +10,7 @@ class ServerController extends Controller
 {
     public function index()
     {
-        $servers = Server::with('subServers')->get();
+        $servers = Server::all();
         return response()->json([
             'status' => true,
             'servers' => $servers
