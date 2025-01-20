@@ -5,49 +5,48 @@ namespace App\Livewire;
 use App\Models\Server;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 
 class ServerEdit extends Component
 {
-    use WithFileUploads;
-
     public $server;
 
-    #[Validate('required|string|max:255')]
+    #[Validate]
     public $name;
 
-    #[Validate('required|in:1,0')]
-    public $status;
+    #[Validate]
+    public $config;
+    #[Validate]
+    public $username;
+    #[Validate]
+    public $password;
 
-    #[Validate('required|int')]
-    public $ping;
-
-    #[Validate('nullable|image|mimes:jpeg,png,gif,bmp|max:20480')]
-    public $image;
+    protected function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'config' => 'required|string',
+            'username' => 'required|string|max:255',
+            'password' => 'required|string|max:255',
+        ];
+    }
 
     public function mount(Server $server)
     {
         $this->server = $server;
-
         $this->name = $server->name;
-        $this->status = $server->status;
-        $this->ping = $server->ping;
+        $this->config = $server->config;
+        $this->username = $server->username;
+        $this->password = $server->password;
     }
 
     public function update()
     {
         $this->server->update([
             'name' => $this->name,
-            'status' => $this->status,
-            'ping' => $this->ping
+            'config' => $this->config,
+            'username' => $this->username,
+            'password' => $this->password,
         ]);
-
-        if ($this->image) {
-            $this->server->clearMediaCollection('server_logo');
-            $this->server->addMedia($this->image->getRealPath())
-                ->usingFileName($this->image->getClientOriginalName())
-                ->toMediaCollection('server_logo');
-        }
 
         return redirect()->route('all-servers')->with([
             'status' => 'success',

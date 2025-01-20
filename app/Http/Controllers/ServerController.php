@@ -25,7 +25,6 @@ class ServerController extends Controller
 
     public function DeleteServer(Server $server)
     {
-        $server->clearMediaCollection('server_logo');
         $server->delete();
         return redirect()->route('all-servers')->with([
             'status' => 'success',
