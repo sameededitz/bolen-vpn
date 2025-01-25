@@ -48,8 +48,8 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/admin.php';
 
-Route::get('/api-docs', function () {
-    return view('auth.api-docs');
+Route::get('/test', function () {
+    return view('pages.email-verified');
 })->name('api-docs');
 
 Route::get('/send-test-email', function () {

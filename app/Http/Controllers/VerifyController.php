@@ -22,7 +22,7 @@ class VerifyController extends Controller
     {
         return $request->user()->hasVerifiedEmail()
             ? redirect()->route('login')
-            : view('auth.login');
+            : view('pages.email-verified');
     }
 
     public function showNotice()
@@ -33,7 +33,7 @@ class VerifyController extends Controller
     public function ResentEmail(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->route('login');
+            return view('pages.email-verified');
         }
         $request->user()->sendEmailVerificationNotification();
         return back()->with('status', 'A new verification link has been sent to the email address you provided during registration.');
@@ -52,7 +52,7 @@ class VerifyController extends Controller
                     'status' => true,
                     'message' => 'Email already Verified'
                 ], 200)
-                : redirect()->route('home')->with('verified', true);
+                : view('pages.email-verified');
         }
 
         if ($user->markEmailAsVerified()) {
@@ -64,7 +64,7 @@ class VerifyController extends Controller
                 'status' => true,
                 'message' => 'Email verified successfully!'
             ], 200)
-            : view('auth.verified-email');
+            : view('pages.email-verified');;
     }
 
     public function forgotPass()
