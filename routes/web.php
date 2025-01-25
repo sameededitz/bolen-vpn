@@ -48,9 +48,9 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/admin.php';
 
-Route::get('/test', function () {
-    return view('pages.email-verified');
-})->name('api-docs');
+// Route::get('/test', function () {
+//     return view('pages.email-verified');
+// })->name('api-docs');
 
 Route::get('/send-test-email', function () {
     \Illuminate\Support\Facades\Mail::raw('This is a test email', function ($message) {
