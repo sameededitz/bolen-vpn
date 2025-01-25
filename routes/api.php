@@ -29,7 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/purchase/status', [PurchaseController::class, 'Status'])->name('api.purchase');
 
-    Route::post('/user/redeem-code', [PurchaseController::class, 'redeemActivationCode'])->name('api.purchase.verify');
+    Route::post('/purchase/verify', [PurchaseController::class, 'redeemActivationCode'])->name('api.purchase.verify');
 });
 
 Route::post('/email/resend-verification', [VerifyController::class, 'resendVerify'])->name('api.verify.resend');

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -17,5 +18,7 @@ class DatabaseSeeder extends Seeder
 
         // Create one regular user
         User::factory()->user()->create();
+
+        Plan::factory()->trial()->create();
     }
 }
