@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\ServerController;
 use App\Http\Controllers\Api\SocialController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VerifyController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\PlanController;
@@ -30,6 +31,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/purchase/status', [PurchaseController::class, 'Status'])->name('api.purchase');
 
     Route::post('/purchase/verify', [PurchaseController::class, 'redeemActivationCode'])->name('api.purchase.verify');
+
+    Route::get('/user', [UserController::class, 'user'])->name('api.user');
+
+    Route::post('/edit-user', [UserController::class, 'update'])->name('api.user.update');
 });
 
 Route::post('/email/resend-verification', [VerifyController::class, 'resendVerify'])->name('api.verify.resend');
