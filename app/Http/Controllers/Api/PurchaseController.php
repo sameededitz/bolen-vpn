@@ -68,7 +68,7 @@ class PurchaseController extends Controller
     public function redeemActivationCode(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required|string|size:10',
+            'activation_code' => 'required|string|size:10',
         ]);
 
         if ($validator->fails()) {
