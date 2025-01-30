@@ -81,7 +81,7 @@ class PurchaseController extends Controller
         /** @var \App\Models\User $user **/
         $user = Auth::user();
 
-        $activationCode = ActivationCode::where('code', $request->code)
+        $activationCode = ActivationCode::where('code', $request->activation_code)
             ->where('is_used', false)
             ->first();
 
