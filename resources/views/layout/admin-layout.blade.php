@@ -20,7 +20,7 @@
         <footer class="d-footer">
             <div class="row align-items-center justify-content-between">
                 <div class="col-auto">
-                    <p class="mb-0">© 2024. All Rights Reserved.</p>
+                    <p class="mb-0">© {{ date('Y') }}. All Rights Reserved.</p>
                 </div>
                 <div class="col-auto">
                     <p class="mb-0">Made by <a href="https://www.instagram.com/not_sameed52/" target="_blank"

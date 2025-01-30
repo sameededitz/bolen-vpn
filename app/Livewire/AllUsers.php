@@ -41,12 +41,34 @@ class AllUsers extends Component
 
         $plan = Plan::find($this->plan_id);
 
-        $this->selectedUser->purchases()->create([
-            'plan_id' => $plan->id,
-            'started_at' => now(),
-            'expires_at' => now()->addMonths($plan->duration),
-            'is_active' => true,
-        ]);
+        $purchase = $this->selectedUser->purchases()
+            ->where('is_active', true)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        $duration = $plan->duration;
+        $expiresAt = match ($plan->duration_unit) {
+            'day'   => now()->addDays($duration),
+            'week'  => now()->addWeeks($duration),
+            'month' => now()->addMonths($duration),
+            'year'  => now()->addYears($duration),
+            default => now()->addDays(7),
+        };
+
+        if ($purchase) {
+            // Extend the existing purchase expiration date
+            $purchase->update([
+                'expires_at' => $purchase->expires_at->add($expiresAt->diff(now())),
+            ]);
+        } else {
+            // Create a new purchase
+            $purchase = $this->selectedUser->purchases()->create([
+                'plan_id' => $plan->id,
+                'started_at' => now(),
+                'expires_at' => $expiresAt,
+                'is_active' => true,
+            ]);
+        }
 
         $this->selectedUser = null;
         $this->plan_id = '';

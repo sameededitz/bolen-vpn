@@ -99,26 +99,35 @@ class PurchaseController extends Controller
             ], 403);
         }
 
-        // Check if the user already has a purchase for this plan
-        $existingPurchase = $user->purchases()
-            ->where('plan_id', $activationCode->plan_id)
+        $plan = $activationCode->plan;
+        $purchase = $user->purchases()
             ->where('is_active', true)
             ->where('expires_at', '>', now())
             ->first();
 
-        if ($existingPurchase) {
-            return response()->json([
-                'status' => false,
-                'message' => 'You already have an active purchase for this plan.',
-            ], 400);
-        }
+        $duration = $plan->duration;
+        $expiresAt = match ($plan->duration_unit) {
+            'day'   => now()->addDays($duration),
+            'week'  => now()->addWeeks($duration),
+            'month' => now()->addMonths($duration),
+            'year'  => now()->addYears($duration),
+            default => now()->addDays(7),
+        };
 
-        $purchase = $user->purchases()->create([
-            'plan_id' => $activationCode->plan_id,
-            'started_at' => now(),
-            'expires_at' => now()->addMonths($activationCode->plan->duration),
-            'is_active' => true,
-        ]);
+        if ($purchase) {
+            // Extend the existing purchase expiration date
+            $purchase->update([
+                'expires_at' => $purchase->expires_at->add($expiresAt->diff(now())),
+            ]);
+        } else {
+            // Create a new purchase
+            $purchase = $user->purchases()->create([
+                'plan_id' => $plan->id,
+                'started_at' => now(),
+                'expires_at' => $expiresAt,
+                'is_active' => true,
+            ]);
+        }
 
         $activationCode->update([
             'is_used' => true,
