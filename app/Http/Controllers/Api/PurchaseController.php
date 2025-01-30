@@ -84,7 +84,6 @@ class PurchaseController extends Controller
         $activationCode = ActivationCode::where('code', $request->activation_code)
             ->where('is_used', false)
             ->first();
-        dd($activationCode);
 
         if (!$activationCode) {
             return response()->json([
