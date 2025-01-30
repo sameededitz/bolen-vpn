@@ -24,7 +24,7 @@
 
     <div class="card basic-data-table">
         <div class="card-header d-flex align-items-center justify-content-between">
-            <h5 class="card-title mb-0">All Servers</h5>
+            <h5 class="card-title mb-0">All Plans</h5>
             <a href="{{ route('add-plan') }}">
                 <button type="button" class="btn rounded-pill btn-outline-info-600 radius-8 px-20 py-11">Add
                     Plan</button>
@@ -38,8 +38,8 @@
                         <th scope="col">Name</th>
                         <th scope="col">Price</th>
                         <th scope="col">Description</th>
-                        <th scope="col">duration</th>
-                        <th scope="col">Time</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Created</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -50,8 +50,9 @@
                             <td>{{ $plan->name }}</td>
                             <td>${{ $plan->price }}/month</td>
                             <td>{{ $plan->description }}</td>
-                            <td>{{ $plan->duration }} months</td>
-                            <td>C:{{ $plan->created_at->diffForHumans() }}<br>U:{{ $plan->updated_at->diffForHumans() }}
+                            <td>{{ $plan->duration }} {{ ucfirst($plan->duration_unit) }} </td>
+                            <td>
+                                C:{{ $plan->created_at->diffForHumans() }}
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
