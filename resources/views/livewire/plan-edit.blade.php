@@ -23,7 +23,6 @@
             <div class="col-12">
                 <label class="form-label">Duration</label>
                 <input type="number" wire:model.blur="duration" class="form-control" placeholder="Duration">
-                <small>Enter Duration in Months, E.g, 24 months = 2 year</small>
             </div>
             <div class="col-12">
                 <label class="form-label">Duration Unit</label>
