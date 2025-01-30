@@ -19,6 +19,11 @@ Route::get('/optimize', function () {
     return 'Optimization completed';
 });
 
+Route::get('/migrate', function () {
+    Artisan::call('migrate');
+    return 'Migration completed';
+});
+
 Route::get('email/verify/view/{id}/{hash}', [VerifyController::class, 'viewEmail'])->name('email.verification.view');
 Route::get('password/reset/view/{email}/{token}', [VerifyController::class, 'viewInBrowser'])->name('password.reset.view');
 
