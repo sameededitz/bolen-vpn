@@ -48,7 +48,7 @@
                         <tr>
                             <td><a href="javascript:void(0)" class="text-primary-600"> {{ $loop->iteration }} </a></td>
                             <td>{{ $plan->name }}</td>
-                            <td>${{ $plan->price }}/month</td>
+                            <td>${{ $plan->price }}</td>
                             <td>{{ $plan->description }}</td>
                             <td>{{ $plan->duration }} {{ ucfirst($plan->duration_unit) }} </td>
                             <td>
