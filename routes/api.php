@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\VerifyController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\SliderController;
+use App\Http\Controllers\UserFeedbackController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -46,3 +47,5 @@ Route::get('/plans', [PlanController::class, 'plans'])->name('api.all.plans');
 Route::get('/sliders', [SliderController::class, 'sliders'])->name('api.all.sliders');
 
 Route::get('/options', [OptionsController::class, 'getOptions'])->name('api.options');
+
+Route::post('/feedback/store', [UserFeedbackController::class, 'store'])->name('api.feedback.store');
