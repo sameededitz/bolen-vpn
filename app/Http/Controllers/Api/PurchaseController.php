@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\ActivationCodeMail;
 use App\Models\ActivationCode;
 use App\Models\Purchase;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -117,7 +118,7 @@ class PurchaseController extends Controller
         if ($purchase) {
             // Extend the existing purchase expiration date
             $purchase->update([
-                'expires_at' => $purchase->expires_at->add($expiresAt->diff(now())),
+                'expires_at' => Carbon::parse($purchase->expires_at)->add($expiresAt->diff(now())),
             ]);
         } else {
             // Create a new purchase

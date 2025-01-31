@@ -27,7 +27,7 @@ class PlanController extends Controller
         $plan->delete();
         return redirect()->route('all-plans')->with([
             'status' => 'success',
-            'message' => 'Plan Deleted Successfully. Make sure to Delete Product from Stripe Dashboard',
+            'message' => 'Plan Deleted Successfully.',
         ]);
     }
 

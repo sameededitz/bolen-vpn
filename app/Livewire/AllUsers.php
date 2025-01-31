@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Plan;
 use App\Models\Purchase;
 use App\Models\User;
+use Carbon\Carbon;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -58,7 +59,7 @@ class AllUsers extends Component
         if ($purchase) {
             // Extend the existing purchase expiration date
             $purchase->update([
-                'expires_at' => $purchase->expires_at->add($expiresAt->diff(now())),
+                'expires_at' => Carbon::parse($purchase->expires_at)->add($expiresAt->diff(now())),
             ]);
         } else {
             // Create a new purchase
