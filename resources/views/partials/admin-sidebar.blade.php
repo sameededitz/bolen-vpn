@@ -44,6 +44,12 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('all-feedbacks') }}">
+                    <iconify-icon icon="material-symbols:feedback-outline-rounded" class="menu-icon"></iconify-icon>
+                    <span>Feedback</span>
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('all-users') }}">
                     <iconify-icon icon="ri:user-line" class="menu-icon"></iconify-icon>
                     <span>Manage Users</span>
