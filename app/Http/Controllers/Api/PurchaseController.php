@@ -107,20 +107,31 @@ class PurchaseController extends Controller
             ->first();
 
         $duration = $plan->duration;
-        $expiresAt = match ($plan->duration_unit) {
-            'day'   => now()->addDays($duration),
-            'week'  => now()->addWeeks($duration),
-            'month' => now()->addMonths($duration),
-            'year'  => now()->addYears($duration),
-            default => now()->addDays(7),
-        };
 
         if ($purchase) {
-            // Extend the existing purchase expiration date
+            $currentExpiresAt = Carbon::parse($purchase->expires_at);
+
+            // Extend the expiration date instead of replacing it
+            $newExpiresAt = match ($plan->duration_unit) {
+                'day'   => $currentExpiresAt->addDays($duration),
+                'week'  => $currentExpiresAt->addWeeks($duration),
+                'month' => $currentExpiresAt->addMonths($duration),
+                'year'  => $currentExpiresAt->addYears($duration),
+                default => $currentExpiresAt->addDays(7),
+            };
+
+            // Update the purchase with the new expiration date
             $purchase->update([
-                'expires_at' => Carbon::parse($purchase->expires_at)->add($expiresAt->diff(now())),
+                'expires_at' => $newExpiresAt,
             ]);
         } else {
+            $expiresAt = match ($plan->duration_unit) {
+                'day'   => now()->addDays($duration),
+                'week'  => now()->addWeeks($duration),
+                'month' => now()->addMonths($duration),
+                'year'  => now()->addYears($duration),
+                default => now()->addDays(7),
+            };
             // Create a new purchase
             $purchase = $user->purchases()->create([
                 'plan_id' => $plan->id,
