@@ -29,7 +29,7 @@ class UserFeedbackController extends Controller
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:1000',
             'rating' => 'required|in:good,bad',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:20420',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:20420',
         ]);
 
         if ($validator->fails()) {
