@@ -45,7 +45,7 @@ class AssignTrialUser
                 $user->purchases()->create([
                     'plan_id' => null, // Optional: Specify a trial plan ID if applicable
                     'started_at' => now(),
-                    'expires_at' => now()->addDays(3),
+                    'expires_at' => now()->addDays($trialDays),
                     'is_active' => true,
                 ]);
             }
