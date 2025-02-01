@@ -44,6 +44,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'verifyR
     Route::delete('/delete-user/{user}', [AdminController::class, 'deleteUser'])->name('delete-user');
 
     Route::get('/options', [OptionsController::class, 'Options'])->name('all-options');
+    Route::post('/options/save-info', [OptionsController::class, 'saveInfo'])->name('save-info');
     Route::post('/options/save', [OptionsController::class, 'saveOptions'])->name('save-options');
 
     Route::get('/adminUsers', [AdminController::class, 'allAdmins'])->name('all-admins');

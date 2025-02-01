@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Option;
 use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -20,5 +21,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->user()->create();
 
         Plan::factory()->trial()->create();
+
+        Option::factory()->trialDays()->create();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Option;
 use App\Models\Options;
 use Illuminate\Http\Request;
 
@@ -9,9 +10,29 @@ class OptionsController extends Controller
 {
     public function Options()
     {
-        $privacyPolicyContent = Options::where('key', 'privacy_policy')->value('value') ?? '';
-        $tosContent = Options::where('key', 'tos')->value('value') ?? '';
-        return view('admin.all-options', compact('privacyPolicyContent', 'tosContent'));
+        $trial_days = Option::where('key', 'trial_days')->value('value') ?? '';
+
+        $privacyPolicyContent = Option::where('key', 'privacy_policy')->value('value') ?? '';
+        $tosContent = Option::where('key', 'tos')->value('value') ?? '';
+        return view('admin.all-options', compact('privacyPolicyContent', 'tosContent', 'trial_days'));
+    }
+
+    public function saveInfo(Request $request)
+    {
+        $request->validate([
+            'trial_days' => 'required|integer|min:1',
+        ]);
+
+        // Save the content to the database or file system
+        Option::updateOrCreate(
+            ['key' => 'trial_days'],
+            ['value' => $request->input('trial_days')]
+        );
+
+        return redirect()->back()->with([
+            'success' => 'success',
+            'message' => 'Options saved successfully',
+        ]);
     }
 
     public function saveOptions(Request $request)
@@ -22,12 +43,12 @@ class OptionsController extends Controller
         ]);
 
         // Save the content to the database or file system
-        Options::updateOrCreate(
+        Option::updateOrCreate(
             ['key' => 'privacy_policy'],
             ['value' => $request->input('privacy_policy')]
         );
 
-        Options::updateOrCreate(
+        Option::updateOrCreate(
             ['key' => 'tos'],
             ['value' => $request->input('tos')]
         );
@@ -41,8 +62,8 @@ class OptionsController extends Controller
     public function getOptions()
     {
         // Retrieve the current content of the Privacy Policy and Terms of Service
-        $privacyPolicyContent = Options::where('key', 'privacy_policy')->value('value') ?? '';
-        $tosContent = Options::where('key', 'tos')->value('value') ?? '';
+        $privacyPolicyContent = Option::where('key', 'privacy_policy')->value('value') ?? '';
+        $tosContent = Option::where('key', 'tos')->value('value') ?? '';
 
         // Return the content as JSON
         return response()->json([

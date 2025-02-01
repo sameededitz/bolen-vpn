@@ -30,31 +30,75 @@
                 <div
                     class="card-header pt-16 pb-0 px-24 bg-base border border-end-0 border-start-0 border-top-0 d-flex align-items-center flex-wrap justify-content-between">
                     <h6 class="text-lg mb-0">Settings</h6>
+                    <ul class="nav bordered-tab d-inline-flex nav-pills mb-0" id="pills-tab-six" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-16 py-10 active" id="pills-home-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
+                                aria-selected="true" tabindex="-1">Info</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-16 py-10" id="pills-details-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-details" type="button" role="tab" aria-controls="pills-details"
+                                aria-selected="false">TOS</button>
+                        </li>
+                    </ul>
                 </div>
                 <div class="card-body p-24 pt-16 mt-24">
-                    @if ($errors->any())
-                        <div class="py-2">
-                            @foreach ($errors->all() as $error)
-                                <x-alert type="danger" :message="$error" />
-                            @endforeach
-                        </div>
-                    @endif
-                    <form id="contentForm" action="{{ route('save-options') }}" method="POST">
-                        @csrf
-                        <div class="row gy-3">
-                            <div class="col-12">
-                                <label class="form-label" for="privacy_policy">Privacy Policy</label>
-                                <textarea name="privacy_policy" id="privacy_policy" class="form-control tinymce-editor">{{ $privacyPolicyContent }}</textarea>
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade active show" id="pills-home" role="tabpanel"
+                            aria-labelledby="pills-home-tab" tabindex="0">
+                            <div>
+                                @if ($errors->any())
+                                    <div class="py-2">
+                                        @foreach ($errors->all() as $error)
+                                            <x-alert type="danger" :message="$error" />
+                                        @endforeach
+                                    </div>
+                                @endif
+                                <form action="{{ route('save-info') }}" method="POST">
+                                    @csrf
+                                    <div class="row mb-24 gy-3 align-items-center">
+                                        <div class="col-12 col-sm-3">
+                                            <label class="form-label mb-0 col-sm-3 w-100">Trial Period</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <input type="number" name="trial_days" class="form-control"
+                                                placeholder="Trial Period" value="{{ $trial_days }}" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary-600">Save</button>
+                                </form>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label" for="terms_of_service">Terms of Service</label>
-                                <textarea id="tosEditor" name="tos" class="form-control tinymce-editor">{{ $tosContent }}</textarea>
+                        </div>
+                        <div class="tab-pane fade" id="pills-details" role="tabpanel" aria-labelledby="pills-details-tab"
+                            tabindex="0">
+                            <div>
+                                @if ($errors->any())
+                                    <div class="py-2">
+                                        @foreach ($errors->all() as $error)
+                                            <x-alert type="danger" :message="$error" />
+                                        @endforeach
+                                    </div>
+                                @endif
+                                <form id="contentForm" action="{{ route('save-options') }}" method="POST">
+                                    @csrf
+                                    <div class="row gy-3">
+                                        <div class="col-12">
+                                            <label class="form-label" for="privacy_policy">Privacy Policy</label>
+                                            <textarea name="privacy_policy" id="privacy_policy" class="form-control tinymce-editor">{{ $privacyPolicyContent }}</textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label" for="terms_of_service">Terms of Service</label>
+                                            <textarea id="tosEditor" name="tos" class="form-control tinymce-editor">{{ $tosContent }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-3">
+                                        <button type="submit" class="btn btn-primary-600">Save</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        <div class="col-12 mt-3">
-                            <button type="submit" class="btn btn-primary-600">Save</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div><!-- card end -->
         </div>
