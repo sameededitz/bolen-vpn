@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Option;
 use App\Models\User;
 use App\Services\AppleToken;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -48,6 +50,9 @@ class SocialController extends Controller
                     'password' => Hash::make(Str::random(10)),
                     'email_verified_at' => now(),
                 ]);
+
+                // Assign a trial to the user
+                $this->assignTrial($user);
             }
 
             // Log the user in
@@ -120,6 +125,7 @@ class SocialController extends Controller
                     'password' => Hash::make(Str::random(10)),
                     'email_verified_at' => now(),
                 ]);
+                $this->assignTrial($user);
             }
 
             // Log the user in
@@ -141,6 +147,35 @@ class SocialController extends Controller
                 'status' => false,
                 'message' => 'Error logging in with Apple. Please try again later.',
                 'error' => 'Error:' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function assignTrial(User $user)
+    {
+        $trialDays = Option::where('key', 'trial_days')->value('value') ?? 3;
+        $trialDays = (int) $trialDays; // Ensure it's an integer
+
+        $activePurchase = $user->purchases()
+            ->where('is_active', true)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if ($activePurchase) {
+            // Extend the expiration date by 3 day
+            $newExpiresAt = Carbon::parse($activePurchase->expires_at)->addDays($trialDays);
+
+            // Update the expiration date
+            $activePurchase->update([
+                'expires_at' => $newExpiresAt,
+            ]);
+        } else {
+            // Create a new purchase with 1 day duration
+            $user->purchases()->create([
+                'plan_id' => null, // Optional: Specify a trial plan ID if applicable
+                'started_at' => now(),
+                'expires_at' => now()->addDays($trialDays),
+                'is_active' => true,
             ]);
         }
     }
