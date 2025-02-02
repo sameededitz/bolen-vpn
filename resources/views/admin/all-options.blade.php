@@ -104,7 +104,6 @@
         </div>
     </div>
 @endsection
-@dd(env('TINYMCE_KEY'))
 @section('admin_scripts')
     <script src="https://cdn.tiny.cloud/1/{{ env('TINYMCE_KEY') }}/tinymce/7/tinymce.min.js" referrerpolicy="origin">
     </script>
