@@ -109,8 +109,16 @@
                     url: `/admin/feedbacks/${submissionId}`,
                     method: 'GET',
                     success: function(response) {
-                        // Populate the modal body with the fetched message
-                        modalBody.html(`<p>${response.message}</p>`);
+                        let content = `<p>${response.message}</p>`;
+
+                        // Check if there's an image URL and display it
+                        if (response.image) {
+                            content +=
+                                `<img src="${response.image}" alt="Feedback Image" class="img-fluid mt-3" />`;
+                        }
+
+                        // Populate the modal body with the message and image (if any)
+                        modalBody.html(content);
                     },
                     error: function() {
                         modalBody.html(

@@ -19,6 +19,7 @@ class UserFeedbackController extends Controller
     {
         return response()->json([
             'message' => $feedback->message,
+            'image' => $feedback->getFirstMediaUrl('image'),
         ]);
     }
 
