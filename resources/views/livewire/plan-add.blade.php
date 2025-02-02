@@ -18,7 +18,7 @@
             </div>
             <div class="col-12">
                 <label class="form-label">Price</label>
-                <input type="number" wire:model.blur="price" class="form-control" placeholder="Price">
+                <input type="number" wire:model.blur="price" step="0.01" class="form-control" placeholder="Price">
             </div>
             <div class="col-12">
                 <label class="form-label">Duration</label>
