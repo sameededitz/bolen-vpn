@@ -22,8 +22,8 @@ class SliderAdd extends Component
     {
         return [
             'title' => 'required|min:3',
-            'description' => 'required|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:20420',
+            'description' => 'required|max:9999',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:51200',
         ];
     }
 

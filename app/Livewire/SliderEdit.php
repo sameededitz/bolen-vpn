@@ -24,8 +24,8 @@ class SliderEdit extends Component
     {
         return [
             'title' => 'required|min:3',
-            'description' => 'required|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:20420',
+            'description' => 'required|max:9999',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:51200',
         ];
     }
 
