@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sliders', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('description');
+            $table->longText('description')->charset('binary');
             $table->timestamps();
         });
     }
