@@ -11,10 +11,11 @@ class OptionsController extends Controller
     public function Options()
     {
         $trial_days = Option::where('key', 'trial_days')->value('value') ?? '';
+        $vpn_timeout = Option::where('key', 'vpn_timeout')->value('value') ?? '';
 
         $privacyPolicyContent = Option::where('key', 'privacy_policy')->value('value') ?? '';
         $tosContent = Option::where('key', 'tos')->value('value') ?? '';
-        return view('admin.all-options', compact('privacyPolicyContent', 'tosContent', 'trial_days'));
+        return view('admin.all-options', compact('privacyPolicyContent', 'tosContent', 'trial_days', 'vpn_timeout'));
     }
 
     public function saveInfo(Request $request)
