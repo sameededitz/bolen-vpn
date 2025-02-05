@@ -21,12 +21,17 @@ class OptionsController extends Controller
     {
         $request->validate([
             'trial_days' => 'required|integer|min:1',
+            'vpn_timeout' => 'required|integer|min:1',
         ]);
 
         // Save the content to the database or file system
         Option::updateOrCreate(
             ['key' => 'trial_days'],
             ['value' => $request->input('trial_days')]
+        );
+        Option::updateOrCreate(
+            ['key' => 'vpn_timeout'],
+            ['value' => $request->input('vpn_timeout')]
         );
 
         return redirect()->back()->with([
@@ -54,7 +59,7 @@ class OptionsController extends Controller
         );
 
         return redirect()->back()->with([
-            'success' => true,
+            'success' => 'success',
             'message' => 'Options saved successfully',
         ]);
     }
@@ -64,11 +69,13 @@ class OptionsController extends Controller
         // Retrieve the current content of the Privacy Policy and Terms of Service
         $privacyPolicyContent = Option::where('key', 'privacy_policy')->value('value') ?? '';
         $tosContent = Option::where('key', 'tos')->value('value') ?? '';
+        $vpnTimeout = Option::where('key', 'vpn_timeout')->value('value') ?? '';
 
         // Return the content as JSON
         return response()->json([
             'privacy_policy' => $privacyPolicyContent,
             'tos' => $tosContent,
+            'vpn_timeout' => $vpnTimeout,
         ]);
     }
 }
