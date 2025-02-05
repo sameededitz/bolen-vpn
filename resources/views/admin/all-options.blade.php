@@ -66,15 +66,6 @@
                                                 placeholder="Trial Period" value="{{ $trial_days }}" required>
                                         </div>
                                     </div>
-                                    <div class="row mb-24 gy-3 align-items-center">
-                                        <div class="col-12 col-sm-3">
-                                            <label class="form-label mb-0 col-sm-3 w-100">VPN Timeout</label>
-                                        </div>
-                                        <div class="col-sm-8">
-                                            <input type="number" name="vpn_timeout" class="form-control"
-                                                placeholder="VPN Timeout" value="{{ $vpn_timeout }}" required>
-                                        </div>
-                                    </div>
                                     <button type="submit" class="btn btn-primary-600">Save</button>
                                 </form>
                             </div>
