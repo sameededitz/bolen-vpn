@@ -20,10 +20,16 @@ class UserFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
+            'slug' => Str::slug($this->faker->unique()->userName()),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => Hash::make('password'), // Default password
-            'role' => 'customer', // Default role
+            'password' => bcrypt('password'), // default password
+            'registration_date' => now(),
+            'last_login' => $this->faker->optional()->dateTimeThisYear(),
+            'online_at' => $this->faker->optional()->dateTimeThisMonth(),
+            'role' => 'user',
+            'google_id' => $this->faker->optional()->uuid(),
+            'apple_id' => $this->faker->optional()->uuid(),
             'remember_token' => Str::random(10),
         ];
     }
@@ -53,7 +59,7 @@ class UserFactory extends Factory
                 'name' => 'user',
                 'email' => 'user@gmail.com',
                 'password' => Hash::make('user12345'),
-                'role' => 'customer',
+                'role' => 'user',
             ];
         });
     }

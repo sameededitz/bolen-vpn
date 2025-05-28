@@ -31,12 +31,5 @@ class PlanController extends Controller
         ]);
     }
 
-    public function plans()
-    {
-        $plans = Plan::all();
-        return response()->json([
-            'status' => true,
-            'plans' => $plans,
-        ]);
-    }
+    
 }

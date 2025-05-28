@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->longText('description')->charset('binary');
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
     }

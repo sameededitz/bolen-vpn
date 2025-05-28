@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Listeners\UpdateLastLogin;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -25,9 +27,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::preventLazyLoading(!app()->isProduction());
+
         Number::useCurrency('MYR', 'RM');
 
         Event::listen(
+            Login::class,
             UpdateLastLogin::class
         );
 

@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Slider extends Model implements HasMedia
 {
     use InteractsWithMedia;
-    protected $fillable = ['title', 'description'];
-
-    protected $appends = ['image_url'];
+    protected $fillable = ['title', 'description', 'is_active'];
 
     public function registerMediaCollections(): void
     {
@@ -21,9 +21,8 @@ class Slider extends Model implements HasMedia
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/bmp']);
     }
 
-    public function getImageUrlAttribute()
+    protected function scopeActive(Builder $query): Builder
     {
-        $media = $this->getFirstMedia('image');
-        return $media ? $media->getUrl() : null;
+        return $query->where('is_active', 1);
     }
 }

@@ -59,16 +59,5 @@ class OptionsController extends Controller
         ]);
     }
 
-    public function getOptions()
-    {
-        // Retrieve the current content of the Privacy Policy and Terms of Service
-        $privacyPolicyContent = Option::where('key', 'privacy_policy')->value('value') ?? '';
-        $tosContent = Option::where('key', 'tos')->value('value') ?? '';
-
-        // Return the content as JSON
-        return response()->json([
-            'privacy_policy' => $privacyPolicyContent,
-            'tos' => $tosContent,
-        ]);
-    }
+    
 }

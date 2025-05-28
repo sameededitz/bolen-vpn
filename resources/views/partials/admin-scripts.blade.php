@@ -9,23 +9,10 @@
 <script src="https://cdn.datatables.net/v/dt/dt-2.1.3/datatables.min.js"></script>
 <!-- Iconify Font js -->
 <script src="{{ asset('admin_assets/js/lib/iconify-icon.min.js') }}"></script>
-<!-- jQuery UI js -->
-<script src="{{ asset('admin_assets/js/lib/jquery-ui.min.js') }}"></script>
-<!-- Vector Map js -->
-<script src="{{ asset('admin_assets/js/lib/jquery-jvectormap-2.0.5.min.js') }}"></script>
-<script src="{{ asset('admin_assets/js/lib/jquery-jvectormap-world-mill-en.js') }}"></script>
-<!-- Popup js -->
-<script src="{{ asset('admin_assets/js/lib/magnifc-popup.min.js') }}"></script>
-<!-- Slick Slider js -->
-<script src="{{ asset('admin_assets/js/lib/slick.min.js') }}"></script>
-<!-- prism js -->
-<script src="{{ asset('admin_assets/js/lib/prism.js') }}"></script>
-<!-- file upload js -->
-<script src="{{ asset('admin_assets/js/lib/file-upload.js') }}"></script>
-<!-- audioplayer -->
-<script src="{{ asset('admin_assets/js/lib/audioplayer.js') }}"></script>
+<!-- SweetAlert js -->
+<script src="{{ asset('admin_assets/js/lib/sweetalert.js') }}"></script>
 
 <!-- main js -->
 <script src="{{ asset('admin_assets/js/app.js') }}"></script>
 
-{{-- <script src="{{ asset('admin_assets/js/homeOneChart.js') }}"></script> --}}
+@yield('scripts')

@@ -1,0 +1,66 @@
+.swal2-title {
+  font-size: 1.875em !important;
+}
+
+/* Apply this class to any div you want to have a max-height and a beautiful scrollbar */
+.mh-300 {
+  max-height: 300px;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.scrollable-pretty {
+  /* Optional: smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+/* Light mode scrollbar (default) */
+.scrollable-pretty::-webkit-scrollbar {
+  width: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.scrollable-pretty::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.13);
+}
+
+.scrollable-pretty::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #fcb69f 0%, #ffecd2 100%);
+}
+
+/* Firefox light mode */
+.scrollable-pretty {
+  scrollbar-width: thin;
+  scrollbar-color: #a8edea #f0f0f0;
+}
+
+/* DARK MODE: when <html data-theme="dark"> */
+html[data-theme="dark"] .scrollable-pretty {
+  scrollbar-color: #3d485c #232a36;
+  /* thumb track */
+}
+
+/* Webkit dark scrollbar */
+html[data-theme="dark"] .scrollable-pretty::-webkit-scrollbar {
+  width: 8px;
+  background: #232a36;
+  border-radius: 4px;
+}
+
+html[data-theme="dark"] .scrollable-pretty::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3d485c 0%, #7686a8 100%);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .scrollable-pretty::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7686a8 0%, #a8b4d6 100%);
+}

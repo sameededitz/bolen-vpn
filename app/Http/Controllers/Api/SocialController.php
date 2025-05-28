@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Option;
-use App\Models\User;
-use App\Services\AppleToken;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Option;
+use Illuminate\Support\Str;
+use App\Services\AppleToken;
 use Illuminate\Http\Request;
+use App\Traits\ManagesUserDevices;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 class SocialController extends Controller
 {
+    use ManagesUserDevices;
+
     public function handleGoogleCallback(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -32,8 +35,11 @@ class SocialController extends Controller
 
         $accessToken = $request->input('token');
         try {
+            /** @disregard @phpstan-ignore-line */
             $googleUser = Socialite::driver('google')->userFromToken($accessToken);
             // Check if the user already exists
+
+            /** @var \App\Models\User $user **/
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
@@ -55,16 +61,24 @@ class SocialController extends Controller
                 $this->assignTrial($user);
             }
 
+            if ($user->isBanned()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Your account is banned. Please contact support.'
+                ], 403);
+            }
+
             // Log the user in
             Auth::login($user);
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+            // Create or refresh the device token
+            $token = $this->createOrRefreshDeviceToken($user, $request);
 
             return response()->json([
                 'status' => true,
                 'message' => 'User logged in successfully!',
                 'user' => $user,
-                'access_token' => $token,
+                'access_token' => $token->plainTextToken,
                 'token_type' => 'Bearer',
             ], 200);
         } catch (\Exception $e) {
@@ -93,10 +107,10 @@ class SocialController extends Controller
 
         try {
             // Generate a fresh client secret
-            // config()->set('services.apple.client_secret', $appleToken->generateClientSecret(true));
+            config()->set('services.apple.client_secret', $appleToken->generateClientSecret(true));
 
             // Retrieve the user from the Apple token
-
+            /** @disregard @phpstan-ignore-line */
             $appleUser = Socialite::driver('apple')->stateless()->userFromToken($request->input('token'));
 
             if (!$appleUser->user['email_verified']) {
@@ -111,6 +125,7 @@ class SocialController extends Controller
             $email = $appleUser->email;
             $name = $appleUser->name ?? $email;
 
+            /** @var \App\Models\User $user **/
             $user = User::where('apple_id', $appleId)->orWhere('email', $email)->first();
 
             if ($user) {
@@ -128,16 +143,24 @@ class SocialController extends Controller
                 $this->assignTrial($user);
             }
 
+            if ($user->isBanned()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Your account is banned. Please contact support.'
+                ], 403);
+            }
+
             // Log the user in
             Auth::login($user);
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+            // Create or refresh the device token
+            $token = $this->createOrRefreshDeviceToken($user, $request);
 
             return response()->json([
                 'status' => true,
                 'message' => 'User logged in successfully!',
                 'user' => $user,
-                'access_token' => $token,
+                'access_token' => $token->plainTextToken,
                 'token_type' => 'Bearer',
             ], 200);
         } catch (\Exception $e) {

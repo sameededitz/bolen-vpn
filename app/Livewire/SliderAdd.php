@@ -11,9 +11,7 @@ class SliderAdd extends Component
 {
     use WithFileUploads;
 
-    #[Validate]
     public $title;
-    #[Validate]
     public $description;
     #[Validate]
     public $image;
@@ -40,10 +38,12 @@ class SliderAdd extends Component
                 ->usingFileName($this->image->getClientOriginalName())
                 ->toMediaCollection('image');
         }
-        return redirect()->route('all-sliders')->with([
-            'status' => 'success',
-            'message' => 'Slider Added Successfully',
-        ]);
+
+        $this->reset(['title', 'description', 'image']);
+
+        $this->dispatch('sweetAlert', title: 'Success', message: 'Slider added successfully!', type: 'success');
+        $this->dispatch('redirect', url: route('all-sliders'));
+        return;
     }
 
     public function removeImage()
@@ -53,6 +53,9 @@ class SliderAdd extends Component
 
     public function render()
     {
-        return view('livewire.slider-add');
+        /** @disregard @phpstan-ignore-line */
+        return view('livewire.slider-add')
+            ->extends('layout.app')
+            ->section('content');
     }
 }

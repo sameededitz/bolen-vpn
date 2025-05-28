@@ -5,8 +5,10 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ServerController;
-use App\Http\Controllers\SliderController;
 use App\Http\Controllers\UserFeedbackController;
+use App\Livewire\AllSliders;
+use App\Livewire\AllUsers;
+use App\Livewire\ManageUser;
 use App\Livewire\SliderAdd;
 use App\Livewire\SliderEdit;
 use Illuminate\Support\Facades\Route;
@@ -15,11 +17,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'verifyR
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin-home');
 
     Route::get('/servers', [ServerController::class, 'Index'])->name('all-servers');
-
     Route::get('/add-server', [ServerController::class, 'AddServer'])->name('add-server');
-
     Route::get('/server/{server}/edit', [ServerController::class, 'EditServer'])->name('edit-server');
-
     Route::delete('/delete-server/{server}', [ServerController::class, 'DeleteServer'])->name('delete-server');
 
     Route::get('/plans', [PlanController::class, 'index'])->name('all-plans');
@@ -31,16 +30,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'verifyR
     Route::post('/generate-code', [ActivationCodeController::class, 'generateActivationCode'])->name('generate-code');
     Route::delete('/codes/delete/{code:code}', [ActivationCodeController::class, 'destroy'])->name('delete-code');
 
-    Route::get('/sliders', [SliderController::class, 'index'])->name('all-sliders');
+    Route::get('/sliders', AllSliders::class)->name('all-sliders');
     Route::get('/slider/add', SliderAdd::class)->name('add-slider');
     Route::get('/slider/{slider}/edit', SliderEdit::class)->name('edit-slider');
-    Route::delete('/slider/{slider}/delete', [SliderController::class, 'destroy'])->name('delete-slider');
 
     Route::get('/feedbacks', [UserFeedbackController::class, 'feedbacks'])->name('all-feedbacks');
     Route::get('/feedbacks/{feedback}', [UserFeedbackController::class, 'view'])->name('edit-feedback');
     Route::delete('/feedbacks/{feedback}', [UserFeedbackController::class, 'destroy'])->name('delete-feedback');
 
-    Route::get('/customers', [AdminController::class, 'AllUsers'])->name('all-users');
+    Route::get('/customers', AllUsers::class)->name('all-users');
+    Route::get('/customers/{user}/manage', ManageUser::class)->name('manage-user');
     Route::delete('/delete-user/{user}', [AdminController::class, 'deleteUser'])->name('delete-user');
 
     Route::get('/options', [OptionsController::class, 'Options'])->name('all-options');

@@ -2,82 +2,91 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
-use App\Mail\CustomEmailVerification;
-use App\Mail\CustomPasswordReset;
-use App\Notifications\CustomResetPassword;
-use App\Notifications\CustomVerifyEmailNotification;
+use Spatie\Sluggable\HasSlug;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Sluggable\SlugOptions;
+use Illuminate\Notifications\Notifiable;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasSlug;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
+        'slug',
         'email',
         'password',
         'role',
         'email_verified_at',
+        'last_login',
+        'online_at',
+        'banned_at',
+        'ban_reason',
+        'apple_id',
+        'google_id',
+        'remember_token',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'last_login' => 'datetime',
+            'online_at' => 'datetime',
+            'banned_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
-    /**
-     * Send the email verification notification.
-     *
-     * @return void
-     */
-    public function sendEmailVerificationNotification()
+    public function getSlugOptions(): SlugOptions
     {
-        $this->notify(new CustomVerifyEmailNotification);
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug');
     }
 
-    /**
-     * Send the password reset notification.
-     *
-     * @param  string  $token
-     * @return void
-     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmailNotification);
+    }
+
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new CustomResetPassword($token));
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     public function purchases()
     {
-        return $this->hasOne(Purchase::class);
+        return $this->hasMany(Purchase::class);
+    }
+
+    public function devices()
+    {
+        return $this->hasMany(UserDevice::class);
+    }
+
+    public function activePlan()
+    {
+        return $this->hasOne(Purchase::class)->where('status', 'active')->where('end_date', '>', now())->latest();
+    }
+
+    public function isBanned(): bool
+    {
+        return !is_null($this->banned_at);
+    }
+
+    public function isOnline(): bool
+    {
+        return !is_null($this->online_at) && $this->online_at->diffInMinutes(now()) < 5;
     }
 }

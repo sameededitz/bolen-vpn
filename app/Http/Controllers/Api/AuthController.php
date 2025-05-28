@@ -2,117 +2,133 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Jobs\SendEmailVerification;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Traits\ManagesUserDevices;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    use ManagesUserDevices;
+
     public function signup(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|min:3|unique:users,name|regex:/^\S*$/',
+        $validated = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8'
+            'password' => 'required|string|min:8',
         ]);
 
-        if ($validator->fails()) {
+        if ($validated->fails()) {
             return response()->json([
                 'status' => false,
-                'message' => $validator->errors()->all()
-            ], 400);
+                'errors' => $validated->errors()->all()
+            ], 422);
         }
 
+        /** @var \App\Models\User $user **/
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'customer'
+            'role' => 'user',
         ]);
 
-        $user->sendEmailVerificationNotification();
-
-        Auth::login($user);
-        /** @var \App\Models\User $user **/
-        $user = Auth::user();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
+        SendEmailVerification::dispatch($user)->delay(now()->addSeconds(5));
 
         return response()->json([
             'status' => true,
-            'message' => 'User created successfully! Verify your Email',
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
+            'message' => 'User created successfully',
+            'user' => new UserResource($user),
+            'verification_required' => true,
+        ], 201);
     }
 
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'password' => 'required|min:8'
+        $validated = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string|min:8',
+            'device_id' => 'required|string|max:255',
+            // 'device_name' => 'required|string|max:255',
+            // 'device_type' => 'required|string|in:mobile,desktop,web',
+            // 'platform' => 'required|string|max:50',
         ]);
 
-        if ($validator->fails()) {
+        if ($validated->fails()) {
             return response()->json([
                 'status' => false,
-                'message' => $validator->errors()->all()
-            ], 400);
+                'errors' => $validated->errors()->all()
+            ], 422);
         }
 
-        $loginType = filter_var($request->name, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
-        $user = User::where($loginType, $request->name)->first();
+        /** @var \App\Models\User $user **/
+        $user = User::where('email', $request->email)->first();
         if (!$user) {
             return response()->json([
                 'status' => false,
-                'message' => "We couldn't find an account with that " . ($loginType == 'email' ? 'email' : 'username') . "."
-            ], 400);
+                'message' => 'User not found'
+            ], 404);
         }
 
-        $credentials = [
-            $loginType => $request->name,
-            'password' => $request->password,
-        ];
-        $remember = $request->has('remember');
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email not verified'
+            ], 403);
+        }
 
-        if (Auth::attempt($credentials, $remember)) {
+        if ($user->isBanned()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Your account has been banned. Please contact support.'
+            ], 403);
+        }
+
+        if (Auth::attempt($request->only(['email', 'password']))) {
             /** @var \App\Models\User $user **/
             $user = Auth::user();
 
-            if (!$user->hasVerifiedEmail()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Please verify your email address.',
-                    'user' => $user
-                ], 400);
-            }
-
-            $token = $user->createToken('auth_token')->plainTextToken;
+            $token = $this->createOrRefreshDeviceToken($user, $request);
 
             return response()->json([
                 'status' => true,
                 'message' => 'User logged in successfully!',
-                'user' => $user,
-                'access_token' => $token,
+                'user' => new UserResource($user),
+                'access_token' => $token->plainTextToken,
                 'token_type' => 'Bearer',
             ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid credentials'
+            ], 401);
         }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'The provided credentials do not match our records.'
-        ], 400);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        $user = Auth::user();
-        /** @var \App\Models\User $user **/
-        $user->tokens()->delete();
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        // Get the current token
+        $token = $user->currentAccessToken();
+
+        if ($token) {
+            // Delete the related device if exists
+            $user->devices()
+                ->where('token_id', $token->id)
+                ->delete();
+
+            // Delete the token itself
+            /** @disregard @phpstan-ignore-line */
+            $token->delete();
+        }
 
         return response()->json([
             'status' => true,

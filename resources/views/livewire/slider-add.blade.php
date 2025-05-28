@@ -1,3 +1,4 @@
+@section('title', 'Add Slider')
 <div>
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 class="fw-semibold mb-0">Sliders</h6>
@@ -59,11 +60,11 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Title</label>
-                                <input type="text" wire:model.blur="title" class="form-control" placeholder="Title">
+                                <textarea wire:model="title" class="form-control"></textarea>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Description</label>
-                                <textarea name="description" wire:model.blur="description" class="form-control" cols="10" rows="2"></textarea>
+                                <textarea name="description" wire:model="description" class="form-control" cols="10" rows="2"></textarea>
                             </div>
                         </div>
                         <div class="col-12 mt-3">
@@ -75,3 +76,22 @@
         </div>
     </div>
 </div>
+@script
+    <script>
+        $wire.on('sweetAlert', (event) => {
+            Swal.fire({
+                title: event.title,
+                text: event.message,
+                icon: event.type,
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
+
+        $wire.on('redirect', (event) => {
+            setTimeout(() => {
+                window.location.href = event.url;
+            }, timeout = 2000);
+        });
+    </script>
+@endscript

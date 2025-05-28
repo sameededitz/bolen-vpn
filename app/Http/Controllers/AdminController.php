@@ -36,19 +36,4 @@ class AdminController extends Controller
             'message' => 'Admin Deleted Successfully',
         ]);
     }
-
-    public function deleteUser(User $user)
-    {
-        $user->delete();
-        return redirect()->route('all-users')->with([
-            'status' => 'success',
-            'message' => 'User Deleted Successfully',
-        ]);
-    }
-
-    public function AllUsers()
-    {
-        return view('admin.all-users');
-    }
-
 }

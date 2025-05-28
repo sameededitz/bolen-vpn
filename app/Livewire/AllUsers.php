@@ -2,103 +2,159 @@
 
 namespace App\Livewire;
 
-use App\Models\Plan;
-use App\Models\Purchase;
 use App\Models\User;
-use Carbon\Carbon;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Livewire\Attributes\Url;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class AllUsers extends Component
 {
-    public $users;
-    public $selectedUser;
+    use WithPagination;
 
-    public $plans;
-    #[Validate]
-    public $plan_id;
+    public string $search = '';
+    public int $perPage = 5;
 
-    protected  function rules()
+    #[Url(as: 'verified')]
+    public ?string $emailVerified = null;
+    #[Url(as: 'from')]
+    public ?string $registeredStart = null;
+    #[Url(as: 'to')]
+    public ?string $registeredEnd = null;
+
+    public $userId;
+    public $name;
+    public $email;
+    public $role;
+    public $password;
+    public $password_confirmation;
+    public $isEdit = false;
+
+    public function resetFilters()
     {
-        return [
-            'plan_id' => 'required|exists:plans,id',
+        $this->reset([
+            'emailVerified',
+            'registeredStart',
+            'registeredEnd',
+        ]);
+    }
+
+    protected function rules()
+    {
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', $this->isEdit
+                ? 'unique:users,email,' . $this->userId
+                : 'unique:users,email'],
+            'role' => $this->isEdit ? ['required', 'in:admin,user'] : ['nullable', 'in:admin,user'], // Role is required only when editing
         ];
+
+        // Only require password when creating user
+        if (!$this->isEdit) {
+            $rules['password'] = [
+                'required',
+                Password::min(6)->mixedCase()->numbers()->symbols()
+            ];
+        } elseif ($this->password) {
+            // Optional password change on edit
+            $rules['password'] = ['nullable', 'confirmed', Password::min(6)->mixedCase()->numbers()->symbols()];
+        }
+
+        return $rules;
     }
 
-    public function mount()
+    public function resetForm()
     {
-        // Load all users with the 'customer' role
-        $this->users = User::where('role', 'customer')
-            ->with(['purchases' => function ($query) {
-                $query->latest()->first();
-            }])
-            ->get();
-        $this->plans = Plan::all();
+        $this->reset([
+            'userId',
+            'name',
+            'email',
+            'role',
+            'password',
+            'password_confirmation',
+        ]);
+        $this->isEdit = false;
+        $this->resetValidation();
     }
 
-    public function addPurchase()
+    public function editUser($userId)
+    {
+        $this->resetForm();
+        $this->isEdit = true;
+
+        $user = User::findOrFail($userId);
+        $this->userId = $user->id;
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->role = $user->role;
+    }
+
+    public function saveUser()
     {
         $this->validate();
 
-        $plan = Plan::find($this->plan_id);
-
-        $purchase = $this->selectedUser->purchases()
-            ->where('is_active', true)
-            ->where('expires_at', '>', now())
-            ->first();
-
-        $duration = $plan->duration;
-        $expiresAt = match ($plan->duration_unit) {
-            'day'   => now()->addDays($duration),
-            'week'  => now()->addWeeks($duration),
-            'month' => now()->addMonths($duration),
-            'year'  => now()->addYears($duration),
-            default => now()->addDays(7),
-        };
-
-        if ($purchase) {
-            // Extend the existing purchase expiration date
-            $purchase->update([
-                'expires_at' => Carbon::parse($purchase->expires_at)->add($expiresAt->diff(now())),
+        if ($this->isEdit) {
+            $user = User::findOrFail($this->userId);
+            $user->update([
+                'name' => $this->name,
+                'email' => $this->email,
+                'role' => $this->role,
             ]);
+            $message = 'User updated successfully.';
         } else {
-            // Create a new purchase
-            $purchase = $this->selectedUser->purchases()->create([
-                'plan_id' => $plan->id,
-                'started_at' => now(),
-                'expires_at' => $expiresAt,
-                'is_active' => true,
+            User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'role' => 'user',
+                'password' => Hash::make($this->password),
+                'email_verified_at' => now(),
             ]);
+            $message = 'User created successfully.';
         }
 
-        $this->selectedUser = null;
-        $this->plan_id = '';
-
-        // Reload users to update the table
-        $this->mount();
-
-        $this->dispatch('close-modal');
-        $this->dispatch('alert_add', ['type' => 'success', 'message' => 'Purchase added successfully!']);
+        $this->dispatch('closeModel');
+        $this->dispatch('sweetAlert', title: 'Success!', message: $message, type: 'success');
+        $this->resetPage();
+        $this->resetForm();
     }
 
-    public function openModal(User $user)
+    public function deleteUser($userId)
     {
-        $this->selectedUser = $user;
-        $this->plan_id = '';
-        $this->dispatch('open-modal');
-    }
+        $user = User::findOrFail($userId);
+        if ($user->role === 'admin') {
+            $this->dispatch('sweetAlert', title: 'Error!', message: 'You cannot delete an admin user.', type: 'error');
+            return;
+        }
 
-    public function clearPurchase(User $user)
-    {
-        $user->purchases()->delete();
-        // Reload users to update the table
-        $this->mount();
-
-        $this->dispatch('alert_clear', ['type' => 'success', 'message' => 'Purchase cleared successfully!']);
+        $user->delete();
+        $this->dispatch('sweetAlert', title: 'Success!', message: 'User deleted successfully.', type: 'success');
+        $this->resetPage();
     }
 
     public function render()
     {
-        return view('livewire.all-users');
+        $users = User::query()
+            ->with('activePlan')
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%')
+                        ->orWhereDate('created_at', $this->search);
+                });
+            })
+            ->when($this->emailVerified === '1', fn($q) => $q->whereNotNull('email_verified_at'))
+            ->when($this->emailVerified === '0', fn($q) => $q->whereNull('email_verified_at'))
+            ->when($this->registeredStart && $this->registeredEnd, function ($query) {
+                $query->whereBetween('created_at', [$this->registeredStart, $this->registeredEnd]);
+            })
+            ->where('role', '!=', 'admin')
+            ->orderBy('created_at', 'desc')
+            ->paginate($this->perPage);
+
+        /** @disregard @phpstan-ignore-line */
+        return view('livewire.all-users', compact('users'))
+            ->extends('layout.app')
+            ->section('content');
     }
 }
