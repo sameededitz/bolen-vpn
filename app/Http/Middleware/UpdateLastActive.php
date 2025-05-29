@@ -19,7 +19,7 @@ class UpdateLastActive
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        if(Auth::check() && $user->currentAccessToken()) {
+        if (Auth::check() && $user->currentAccessToken()) {
             $tokenId = $request->user()->currentAccessToken()->id;
 
             $device = $request->user()->devices()
@@ -27,9 +27,9 @@ class UpdateLastActive
                 ->first();
 
             if ($device) {
-                $device->update([
-                    'last_active_at' => now()
-                ]);
+                if ($device->last_active_at === null || $device->last_active_at->diffInMinutes(now()) >= 1) {
+                    $device->update(['last_active_at' => now()]);
+                }
             }
         }
 

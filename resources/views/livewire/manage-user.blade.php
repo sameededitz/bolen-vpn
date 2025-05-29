@@ -104,6 +104,11 @@
                         </button>
                     @endif
 
+                    <button class="btn btn-outline-primary _effect--ripple" wire:click="$js.confirmResetPassword()">
+                        <i class="bx bx-mail-send me-1"></i>
+                        Send Password Reset Link
+                    </button>
+
                     <button class="btn btn-outline-warning" wire:click="$js.confirmRevokeAllDevices()">
                         <i class="bx bx-user-x me-1"></i>
                         Revoke All Access
@@ -377,6 +382,21 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $wire.revokeAllDevices();
+                }
+            });
+        });
+
+        $js('confirmResetPassword', () => {
+            Swal.fire({
+                title: 'Send Password Reset Link?',
+                text: 'This will also revoke all current ongoing sessions. Continue?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, send link',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $wire.sendPasswordResetLink();
                 }
             });
         });

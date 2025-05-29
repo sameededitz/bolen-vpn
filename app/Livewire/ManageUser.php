@@ -6,7 +6,9 @@ use App\Models\Plan;
 use App\Models\User;
 use Livewire\Component;
 use Illuminate\Support\Carbon;
+use App\Jobs\SendPasswordReset;
 use App\Jobs\SendEmailVerification;
+use Illuminate\Support\Facades\Password;
 
 class ManageUser extends Component
 {
@@ -107,6 +109,20 @@ class ManageUser extends Component
             $this->dispatch('sweetAlert', title: 'Success', message: 'Verification email resent.', type: 'success');
         } else {
             $this->dispatch('sweetAlert', title: 'Info', message: 'Email is already verified.', type: 'info');
+        }
+    }
+
+    public function sendPasswordResetLink()
+    {
+        if ($this->user->hasVerifiedEmail()) {
+            $token = Password::createToken($this->user);
+            SendPasswordReset::dispatch($this->user, $token)->delay(now()->addSeconds(5));
+            $this->user->tokens()->delete(); // Revoke all tokens
+            $this->user->devices()->delete(); // Revoke all devices
+            $this->user->refresh();
+            $this->dispatch('sweetAlert', title: 'Success', message: 'Password reset link sent successfully.', type: 'success');
+        } else {
+            $this->dispatch('sweetAlert', title: 'Error', message: 'User email is not verified.', type: 'error');
         }
     }
 
