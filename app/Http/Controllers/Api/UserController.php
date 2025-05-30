@@ -110,6 +110,30 @@ class UserController extends Controller
         ], 500);
     }
 
+    public function online()
+    {
+        /** @var \App\Models\User $user **/
+        $user = Auth::user();
+        $user->update(['online_at' => now()]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Online status updated',
+        ]);
+    }
+
+    public function offline()
+    {
+        /** @var \App\Models\User $user **/
+        $user = Auth::user();
+        $user->update(['online_at' => null]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Offline status updated',
+        ]);
+    }
+
     public function devices()
     {
         /** @var \App\Models\User $user **/
