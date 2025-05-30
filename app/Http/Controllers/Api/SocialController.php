@@ -24,6 +24,7 @@ class SocialController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'token' => 'required|string',
+            'device_id' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -96,6 +97,7 @@ class SocialController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'token' => 'required|string',
+            'device_id' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
