@@ -56,7 +56,7 @@ class ResourceController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function feedback(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',

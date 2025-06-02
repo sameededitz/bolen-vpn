@@ -48,4 +48,4 @@ Route::middleware(['auth:sanctum', 'authorized', 'touch'])->group(function () {
     Route::get('/options', [ResourceController::class, 'options'])->name('api.options');
 });
 
-Route::post('/feedback/store', [UserFeedbackController::class, 'store'])->name('api.feedback.store');
+Route::post('/feedback/store', [ResourceController::class, 'feedback'])->name('api.feedback.store');
