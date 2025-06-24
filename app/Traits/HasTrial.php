@@ -12,7 +12,7 @@ trait HasTrial
             return;
         }
 
-        $days = Option::where('key', 'trial_days')
+        $days = (int) Option::where('key', 'trial_days')
             ->first()
             ?->value;
 

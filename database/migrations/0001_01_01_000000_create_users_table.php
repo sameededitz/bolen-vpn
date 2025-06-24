@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('google_id')->nullable()->unique();
             $table->string('apple_id')->nullable()->unique();
             $table->boolean('has_had_trial')->default(false);
+            $table->timestamp('trial_ends_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
