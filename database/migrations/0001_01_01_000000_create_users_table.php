@@ -26,6 +26,7 @@ return new class extends Migration
             $table->enum('role', ['user', 'admin'])->default('user');
             $table->string('google_id')->nullable()->unique();
             $table->string('apple_id')->nullable()->unique();
+            $table->boolean('has_had_trial')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

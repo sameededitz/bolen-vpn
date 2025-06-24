@@ -33,7 +33,7 @@ class PurchaseController extends Controller
         $user = Auth::user();
 
         $plan = Plan::findOrFail($request->plan_id);
-        if(!$plan) {
+        if (!$plan) {
             return response()->json([
                 'status' => false,
                 'message' => 'Plan not found.',
@@ -69,6 +69,16 @@ class PurchaseController extends Controller
     {
         /** @var \App\Models\User $user **/
         $user = Auth::user();
+
+        if ($user->onTrial()) {
+            return response()->json([
+                'status' => true,
+                'on_trial' => true,
+                'trial_ends_at' => $user->trial_ends_at,
+                'remaining_days' => now()->diffInDays($user->trial_ends_at),
+            ], 200);
+        }
+
         $activePlan = $user->purchases()
             ->where('status', 'active')
             ->where('end_date', '>', now())
@@ -77,6 +87,8 @@ class PurchaseController extends Controller
 
         return response()->json([
             'status' => true,
+            'on_trial' => false,
+            'remaining_days' => $activePlan ? now()->diffInDays($activePlan->end_date) : 0,
             'purchase' => $activePlan ? new PurchaseResource($activePlan) : null,
         ], 200);
     }

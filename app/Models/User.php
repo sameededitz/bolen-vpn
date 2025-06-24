@@ -9,12 +9,13 @@ use Illuminate\Notifications\Notifiable;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\ResetPasswordNotification;
+use App\Traits\HasTrial;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasApiTokens, HasSlug;
+    use HasFactory, Notifiable, HasApiTokens, HasSlug, HasTrial;
 
     protected $fillable = [
         'name',
@@ -29,6 +30,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'ban_reason',
         'apple_id',
         'google_id',
+        'has_had_trial',
+        'trial_ends_at',
         'remember_token',
     ];
 
@@ -45,6 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'online_at' => 'datetime',
             'banned_at' => 'datetime',
             'password' => 'hashed',
+            'trial_ends_at' => 'datetime',
         ];
     }
 
@@ -85,8 +89,23 @@ class User extends Authenticatable implements MustVerifyEmail
         return !is_null($this->banned_at);
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function hasAnyRole(string ...$roles): bool
+    {
+        return in_array($this->role, $roles);
+    }
+
     public function isOnline(): bool
     {
         return !is_null($this->online_at) && $this->online_at->diffInMinutes(now()) < 5;
+    }
+
+    public function onTrial(): bool
+    {
+        return $this->trial_ends_at && now()->lt($this->trial_ends_at);
     }
 }

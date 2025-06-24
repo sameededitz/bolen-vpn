@@ -8,7 +8,9 @@ class PlanController extends Controller
 {
     public function index()
     {
-        $plans = Plan::all();
+        $plans = Plan::where('id', '!=', 1) // Exclude the trial plan
+            ->orderBy('id', 'desc')
+            ->get();
         return view('admin.all-plans', compact('plans'));
     }
 

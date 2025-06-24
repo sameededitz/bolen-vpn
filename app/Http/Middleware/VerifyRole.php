@@ -14,14 +14,21 @@ class VerifyRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string ...$role): Response
     {
-        if (Auth::check() && Auth::user()->role === $role) {
-            return $next($request);
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        if (!$user || !$user->hasAnyRole(...$role)) {
+            return $request->wantsJson()
+                ? response()->json([
+                    'message' => 'Unauthorized. You do not have the required role to access this resource.',
+                ], Response::HTTP_UNAUTHORIZED)
+                : redirect()->route('login')->withErrors([
+                    'message' => 'Unauthorized. You do not have the required role to access this resource.',
+                ]);
         }
-        return redirect()->route('home')->with([
-            'status' => 'error',
-            'message' => 'You do not have access to this section.'
-        ]);
+
+        return $next($request);
     }
 }

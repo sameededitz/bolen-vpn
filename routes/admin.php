@@ -13,7 +13,7 @@ use App\Livewire\SliderAdd;
 use App\Livewire\SliderEdit;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'verifyRole:admin']], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'role:admin']], function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin-home');
 
     Route::get('/servers', [ServerController::class, 'Index'])->name('all-servers');

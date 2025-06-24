@@ -40,27 +40,34 @@ class SocialController extends Controller
             $googleUser = Socialite::driver('google')->userFromToken($accessToken);
             // Check if the user already exists
 
-            /** @var \App\Models\User $user **/
-            $user = User::where('email', $googleUser->getEmail())->first();
+            $googleId = $googleUser->getId();
+            $email = $googleUser->getEmail();
+            $name = $googleUser->getName();
 
-            if ($user) {
-                // If user exists, update all details except email
-                $user->update([
-                    'google_id' => $googleUser->getId(),
-                ]);
-            } else {
-                // If user does not exist, create a new user
+            // First, check by google_id
+            /** @var \App\Models\User $user **/
+            $user = User::where('google_id', $googleId)->first();
+
+            if (!$user && $email) {
+                // Then fallback to email
+                $existing = User::where('email', $email)->first();
+                if ($existing) {
+                    $existing->update(['google_id' => $googleId]);
+                    $user = $existing;
+                }
+            }
+
+            // Create new if no user found
+            if (!$user) {
                 $user = User::create([
-                    'name' => $googleUser->getName(),
-                    'email' => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
+                    'name' => $name,
+                    'email' => $email,
+                    'google_id' => $googleId,
                     'password' => Hash::make(Str::random(10)),
                     'email_verified_at' => now(),
                 ]);
-
-                // Assign a trial to the user
-                $this->assignTrial($user);
             }
+            $user->giveTrialIfEligible();
 
             if ($user->isBanned()) {
                 return response()->json([
@@ -111,7 +118,6 @@ class SocialController extends Controller
             // Generate a fresh client secret
             config()->set('services.apple.client_secret', $appleToken->generateClientSecret(true));
 
-            // Retrieve the user from the Apple token
             /** @disregard @phpstan-ignore-line */
             $appleUser = Socialite::driver('apple')->stateless()->userFromToken($request->input('token'));
 
@@ -122,19 +128,22 @@ class SocialController extends Controller
                 ], 400);
             }
 
-            // Extract user details
+            // Extract user detailsAdd commentMore actions
             $appleId = $appleUser->id;
             $email = $appleUser->email;
             $name = $appleUser->name ?? $email;
 
-            /** @var \App\Models\User $user **/
-            $user = User::where('apple_id', $appleId)->orWhere('email', $email)->first();
+            $user = User::where('apple_id', $appleId)->first();
 
-            if ($user) {
-                // Update Apple ID if needed
-                $user->update(['apple_id' => $appleId]);
-            } else {
-                // Create a new user
+            if (!$user && $email) {
+                $existing = User::where('email', $email)->first();
+                if ($existing) {
+                    $existing->update(['apple_id' => $appleId]);
+                    $user = $existing;
+                }
+            }
+
+            if (!$user) {
                 $user = User::create([
                     'name' => $name,
                     'email' => $email,
@@ -142,8 +151,8 @@ class SocialController extends Controller
                     'password' => Hash::make(Str::random(10)),
                     'email_verified_at' => now(),
                 ]);
-                $this->assignTrial($user);
             }
+            $user->giveTrialIfEligible();
 
             if ($user->isBanned()) {
                 return response()->json([
@@ -172,35 +181,6 @@ class SocialController extends Controller
                 'status' => false,
                 'message' => 'Error logging in with Apple. Please try again later.',
                 'error' => 'Error:' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function assignTrial(User $user)
-    {
-        $trialDays = Option::where('key', 'trial_days')->value('value') ?? 3;
-        $trialDays = (int) $trialDays; // Ensure it's an integer
-
-        $activePurchase = $user->purchases()
-            ->where('is_active', true)
-            ->where('expires_at', '>', now())
-            ->first();
-
-        if ($activePurchase) {
-            // Extend the expiration date by 3 day
-            $newExpiresAt = Carbon::parse($activePurchase->expires_at)->addDays($trialDays);
-
-            // Update the expiration date
-            $activePurchase->update([
-                'expires_at' => $newExpiresAt,
-            ]);
-        } else {
-            // Create a new purchase with 1 day duration
-            $user->purchases()->create([
-                'plan_id' => null, // Optional: Specify a trial plan ID if applicable
-                'started_at' => now(),
-                'expires_at' => now()->addDays($trialDays),
-                'is_active' => true,
             ]);
         }
     }

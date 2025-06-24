@@ -18,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'verifyRole' => VerifyRole::class,
+            'role' => VerifyRole::class,
             'authorized' => EnsureUserIsActive::class,
             'touch' => UpdateLastActive::class,
         ]);

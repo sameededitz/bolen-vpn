@@ -26,9 +26,11 @@ class PlanFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'name' => 'New User 3 Day Trial (Do Not Delete)',
+                'slug' => 'free-trial',
                 'description' => 'This is a trial plan for new users. It expires in 3 days.',
                 'price' => 0,
                 'duration' => 3,
+                'duration_unit' => 'day',
             ];
         });
     }

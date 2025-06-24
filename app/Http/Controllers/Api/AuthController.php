@@ -41,6 +41,8 @@ class AuthController extends Controller
 
         SendEmailVerification::dispatch($user)->delay(now()->addSeconds(5));
 
+        $user->giveTrialIfEligible();
+
         return response()->json([
             'status' => true,
             'message' => 'User created successfully',
