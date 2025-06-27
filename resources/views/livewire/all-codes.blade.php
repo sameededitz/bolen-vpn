@@ -55,22 +55,21 @@
                                                 wire:click="resetFilters">Reset</p>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="mb-1">Email Verified</label>
-                                            <select class="form-select form-control-sm" wire:model.live="emailVerified">
+                                            <label class="mb-1">Used/Unused</label>
+                                            <select class="form-select form-control-sm" wire:model.live="isUsed">
                                                 <option value="">All</option>
-                                                <option value="1">Verified</option>
-                                                <option value="0">Not Verified</option>
+                                                <option value="1">Used</option>
+                                                <option value="0">Unused</option>
                                             </select>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="mb-1">Registered From</label>
-                                            <input type="date" class="form-control form-control-sm"
-                                                wire:model.live="registeredStart">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="mb-1">Registered To</label>
-                                            <input type="date" class="form-control form-control-sm"
-                                                wire:model.live="registeredEnd">
+                                            <label class="mb-1">Plan</label>
+                                            <select class="form-select form-control-sm" wire:model.live="selectedPlan">
+                                                <option value="">All Plans</option>
+                                                @foreach ($plans as $plan)
+                                                    <option value="{{ $plan->id }}">{{ $plan->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </li>
                                 </ul>

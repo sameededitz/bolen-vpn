@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Plan;
 use Livewire\Component;
+use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use App\Models\ActivationCode;
 
@@ -13,6 +14,11 @@ class AllCodes extends Component
 
     public string $search = '';
     public int $perPage = 5;
+
+    #[Url(as: 'used')]
+    public ?string $isUsed = null;
+    #[Url(as: 'plan')]
+    public ?string $selectedPlan = null;
 
     public $plan;
     public $quantity = 1;
@@ -24,6 +30,16 @@ class AllCodes extends Component
             'quantity',
         ]);
         $this->resetValidation();
+    }
+
+    public function resetFilters()
+    {
+        $this->reset([
+            'search',
+            'isUsed',
+            'selectedPlan',
+        ]);
+        $this->resetPage();
     }
 
     protected function rules()
@@ -70,7 +86,7 @@ class AllCodes extends Component
     {
         $this->resetPage();
     }
-    
+
     public function updatingPerPage()
     {
         $this->resetPage();
@@ -84,6 +100,12 @@ class AllCodes extends Component
             ->with(['plan', 'user'])
             ->when($this->search, function ($query) {
                 $query->where('code', 'like', '%' . $this->search . '%');
+            })
+            ->when($this->isUsed !== null, function ($query) {
+                $query->where('is_used', $this->isUsed);
+            })
+            ->when($this->selectedPlan, function ($query) {
+                $query->where('plan_id', $this->selectedPlan);
             })
             ->latest()
             ->paginate($this->perPage);
