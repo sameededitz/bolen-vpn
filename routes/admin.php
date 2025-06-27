@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\ActivationCodeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\UserFeedbackController;
+use App\Livewire\AllCodes;
 use App\Livewire\AllSliders;
 use App\Livewire\AllUsers;
 use App\Livewire\ManageUser;
@@ -26,9 +26,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'role:ad
     Route::get('/plans/{plan:slug}', [PlanController::class, 'EditPlan'])->name('edit-plan');
     Route::delete('/plans/{plan:slug}', [PlanController::class, 'deletePlan'])->name('delete-plan');
 
-    Route::get('/codes', [ActivationCodeController::class, 'codes'])->name('all-codes');
-    Route::post('/generate-code', [ActivationCodeController::class, 'generateActivationCode'])->name('generate-code');
-    Route::delete('/codes/delete/{code:code}', [ActivationCodeController::class, 'destroy'])->name('delete-code');
+    Route::get('/codes', AllCodes::class)->name('all-codes');
 
     Route::get('/sliders', AllSliders::class)->name('all-sliders');
     Route::get('/slider/add', SliderAdd::class)->name('add-slider');
