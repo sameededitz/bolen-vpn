@@ -148,7 +148,7 @@ class AllUsers extends Component
             ->when($this->registeredStart && $this->registeredEnd, function ($query) {
                 $query->whereBetween('created_at', [$this->registeredStart, $this->registeredEnd]);
             })
-            ->where('role', '!=', 'admin')
+            ->where('role', 'user')
             ->orderBy('created_at', 'desc')
             ->paginate($this->perPage);
 
