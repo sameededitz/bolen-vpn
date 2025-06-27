@@ -44,25 +44,6 @@
                         </div>
                         <ul class="to-top-list">
                             <li>
-                                <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                                    href="view-profile.html">
-                                    <iconify-icon icon="solar:user-linear" class="icon text-xl"></iconify-icon> My
-                                    Profile</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                                    href="email.html">
-                                    <iconify-icon icon="tabler:message-check" class="icon text-xl"></iconify-icon>
-                                    Inbox</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-primary d-flex align-items-center gap-3"
-                                    href="company.html">
-                                    <iconify-icon icon="icon-park-outline:setting-two"
-                                        class="icon text-xl"></iconify-icon>
-                                    Setting</a>
-                            </li>
-                            <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
                                     <button

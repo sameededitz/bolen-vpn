@@ -12,7 +12,7 @@ class ActivationCodeController extends Controller
 {
     public function codes()
     {
-        $codes = ActivationCode::with('plan')->get();
+        $codes = ActivationCode::with('plan','user')->get();
         $plans = Plan::all();
         return view('admin.all-codes', compact('codes', 'plans'));
     }
